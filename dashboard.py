@@ -27,10 +27,10 @@ Berikut adalah hasil dari analisis data penyewaan sepeda:
 
 # Memuat dataset
 @st.cache_data
-def load_data():
-    day_df = pd.read_csv('E:\MSIB\Bangkit\Tugas Analisis data dengan python\day.csv')
-    hour_df = pd.read_csv('E:\MSIB\Bangkit\Tugas Analisis data dengan python\hour.csv')
-    return day_df, hour_df
+def load_data(day_file, hour_file):
+    day_data = pd.read_csv(day_file)
+    hour_data = pd.read_csv(hour_file)
+    return day_data, hour_data
 
 # Memuat data
 day_df, hour_df = load_data()
