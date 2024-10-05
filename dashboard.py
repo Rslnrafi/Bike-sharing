@@ -28,9 +28,9 @@ Berikut adalah hasil dari analisis data penyewaan sepeda:
 # Fungsi untuk memuat data
 @st.cache
 def load_data(day_file, hour_file):
-    day_data = pd.read_csv(day_file)
-    hour_data = pd.read_csv(hour_file)
-    return day_data, hour_data
+    day_df = pd.read_csv(day_file)
+    hour_df = pd.read_csv(hour_file)
+    return day_df, hour_df
 
 # Fungsi untuk analisis regresi
 def regression_analysis(X, y):
@@ -39,24 +39,24 @@ def regression_analysis(X, y):
     return model
 
 # Fungsi untuk clustering
-def kmeans_clustering(data):
+def kmeans_clustering(df):
     kmeans = KMeans(n_clusters=3)
-    data['cluster'] = kmeans.fit_predict(data[['casual', 'registered']])
-    return data
+    df['cluster'] = kmeans.fit_predict(df[['casual', 'registered']])
+    return df
 
 # Fungsi utama untuk Streamlit
 def main():
     st.title("Analisis Penggunaan Sepeda Berdasarkan Data Berbagi Sepeda")
 
     # Load data
-    day_data, hour_data = load_data('day.csv', 'hour.csv')
+    day_df, hour_df = load_data('day.csv', 'hour.csv')
     
     # Menampilkan data mentah jika di centang
     if st.checkbox("Tampilkan data mentah harian"):
-        st.write(day_data.head())
+        st.write(day_df.head())
 
     if st.checkbox("Tampilkan data mentah jam-jaman"):
-        st.write(hour_data.head())
+        st.write(hour_df.head())
 
 # Konversi kolom 'dteday' menjadi datetime
 day_df['dteday'] = pd.to_datetime(day_df['dteday'])
