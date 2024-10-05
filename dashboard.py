@@ -50,13 +50,23 @@ def main():
 
     # Load data
     day_df, hour_df = load_data('day.csv', 'hour.csv')
-    
+
+    # Konversi kolom 'dteday' menjadi datetime
+    day_df['dteday'] = pd.to_datetime(day_df['dteday'])
+    hour_df['dteday'] = pd.to_datetime(hour_df['dteday'])
+
     # Menampilkan data mentah jika di centang
     if st.checkbox("Tampilkan data mentah harian"):
         st.write(day_df.head())
 
     if st.checkbox("Tampilkan data mentah jam-jaman"):
         st.write(hour_df.head())
+
+    # Tempatkan fungsi-fungsi lain di sini (misalnya clustering, regresi, dll)
+
+# Memanggil fungsi utama
+if __name__ == "__main__":
+    main()
 
 # Konversi kolom 'dteday' menjadi datetime
 day_df['dteday'] = pd.to_datetime(day_df['dteday'])
