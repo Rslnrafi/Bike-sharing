@@ -28,8 +28,8 @@ Berikut adalah hasil dari analisis data penyewaan sepeda:
 # Memuat dataset
 @st.cache
 def load_data(day_file, hour_file):
-    day_df = pd.read_csv(day.csv)
-    hour_df = pd.read_csv(hour.csv)
+    day_df = pd.read_csv('day.csv')
+    hour_df = pd.read_csv('hour.csv')
     return day_df, hour_df
 
 # Memuat data
