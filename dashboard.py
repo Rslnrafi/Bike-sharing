@@ -32,6 +32,9 @@ def load_data(day_file, hour_file):
     hour_df = pd.read_csv(hour_file)
     return day_df, hour_df
 
+# Memuat data
+day_df, hour_df = load_data()
+
 # Konversi kolom 'dteday' menjadi datetime
 day_df['dteday'] = pd.to_datetime(day_df['dteday'])
 hour_df['dteday'] = pd.to_datetime(hour_df['dteday'])
