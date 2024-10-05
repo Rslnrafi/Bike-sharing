@@ -25,48 +25,15 @@ Beberapa metode analisis digunakan dalam dashboard ini untuk mengeksplorasi pola
 Berikut adalah hasil dari analisis data penyewaan sepeda:
 """)
 
-# Fungsi untuk memuat data
+# Memuat dataset
 @st.cache
-def load_data(day_file, hour_file):
-    day_df = pd.read_csv(day_file)
-    hour_df = pd.read_csv(hour_file)
+def load_data():
+    day_df = pd.read_csv('path_to_your_day_file.csv')
+    hour_df = pd.read_csv('path_to_your_hour_file.csv')
     return day_df, hour_df
 
-# Fungsi untuk analisis regresi
-def regression_analysis(X, y):
-    X_const = sm.add_constant(X)
-    model = sm.OLS(y, X_const).fit()
-    return model
-
-# Fungsi untuk clustering
-def kmeans_clustering(df):
-    kmeans = KMeans(n_clusters=3)
-    df['cluster'] = kmeans.fit_predict(df[['casual', 'registered']])
-    return df
-
-# Fungsi utama untuk Streamlit
-def main():
-    st.title("Analisis Penggunaan Sepeda Berdasarkan Data Berbagi Sepeda")
-
-    # Load data
-    day_df, hour_df = load_data('day.csv', 'hour.csv')
-
-    # Konversi kolom 'dteday' menjadi datetime
-    day_df['dteday'] = pd.to_datetime(day_df['dteday'])
-    hour_df['dteday'] = pd.to_datetime(hour_df['dteday'])
-
-    # Menampilkan data mentah jika di centang
-    if st.checkbox("Tampilkan data mentah harian"):
-        st.write(day_df.head())
-
-    if st.checkbox("Tampilkan data mentah jam-jaman"):
-        st.write(hour_df.head())
-
-    # Tempatkan fungsi-fungsi lain di sini (misalnya clustering, regresi, dll)
-
-# Memanggil fungsi utama
-if __name__ == "__main__":
-    main()
+# Memuat data
+day_df, hour_df = load_data()
 
 # Konversi kolom 'dteday' menjadi datetime
 day_df['dteday'] = pd.to_datetime(day_df['dteday'])
