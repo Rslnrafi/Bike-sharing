@@ -25,15 +25,38 @@ Beberapa metode analisis digunakan dalam dashboard ini untuk mengeksplorasi pola
 Berikut adalah hasil dari analisis data penyewaan sepeda:
 """)
 
-# Memuat dataset
+# Fungsi untuk memuat data
 @st.cache
 def load_data(day_file, hour_file):
-    day_df = pd.read_csv(day_file)
-    hour_df = pd.read_csv(hour_file)
-    return day_df, hour_df
+    day_data = pd.read_csv(day_file)
+    hour_data = pd.read_csv(hour_file)
+    return day_data, hour_data
 
-# Memuat data
-day_df, hour_df = load_data()
+# Fungsi untuk analisis regresi
+def regression_analysis(X, y):
+    X_const = sm.add_constant(X)
+    model = sm.OLS(y, X_const).fit()
+    return model
+
+# Fungsi untuk clustering
+def kmeans_clustering(data):
+    kmeans = KMeans(n_clusters=3)
+    data['cluster'] = kmeans.fit_predict(data[['casual', 'registered']])
+    return data
+
+# Fungsi utama untuk Streamlit
+def main():
+    st.title("Analisis Penggunaan Sepeda Berdasarkan Data Berbagi Sepeda")
+
+    # Load data
+    day_data, hour_data = load_data('day.csv', 'hour.csv')
+    
+    # Menampilkan data mentah jika di centang
+    if st.checkbox("Tampilkan data mentah harian"):
+        st.write(day_data.head())
+
+    if st.checkbox("Tampilkan data mentah jam-jaman"):
+        st.write(hour_data.head())
 
 # Konversi kolom 'dteday' menjadi datetime
 day_df['dteday'] = pd.to_datetime(day_df['dteday'])
