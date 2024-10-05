@@ -19,7 +19,6 @@ Dataset ini berisi data penyewaan sepeda yang dikumpulkan dari sistem bike shari
 ### Metode Analisis
 Beberapa metode analisis digunakan dalam dashboard ini untuk mengeksplorasi pola penggunaan sepeda:
 - **Exploratory Data Analysis (EDA)**: Menggambarkan pola penggunaan sepeda berdasarkan waktu, cuaca, dan kategori pengguna.
-- **RFM Analysis**: Mengukur rata-rata penyewaan sepeda oleh pengguna terdaftar berdasarkan bulan dan musim.
 - **Clustering**: Metode **K-Means** digunakan untuk mengelompokkan hari-hari berdasarkan kondisi cuaca dan jumlah penyewaan sepeda.
 
 Berikut adalah hasil dari analisis data penyewaan sepeda:
@@ -140,38 +139,46 @@ st.markdown("""
 - Pengguna registered lebih aktif di pagi dan sore hari saat waktu komuter.
 """)
 
-# Tren Penyewaan Sepeda Berdasarkan Bulan dan Musim
-st.subheader("Monthly Bike Rentals by Season")
-plt.figure(figsize=(14, 7))
-sns.boxplot(x='mnth', y='cnt', hue='season', data=day_df, palette='Set3')
-plt.title('Monthly Bike Rentals by Season')
-plt.xlabel('Month')
-plt.ylabel('Total Rentals')
-plt.legend(title='Season', bbox_to_anchor=(1.05, 1), loc='upper left')
-plt.grid(True)
-plt.tight_layout()
+# Visualisasi Pola Penggunaan Sepeda Berdasarkan Musim, Bulan, dan Hari dalam Seminggu
+st.subheader("Pola Penggunaan Sepeda Berdasarkan Musim, Bulan, dan Hari dalam Seminggu")
+
+# Plot Average Usage by Season, Month, and Weekday
+fig, axs = plt.subplots(1, 3, figsize=(18, 6))
+
+# Average Bike Usage by Season
+sns.barplot(x="season", y="cnt", data=day_df, ax=axs[0], palette="Blues")
+axs[0].set_title("Average Bike Usage by Season")
+
+# Average Bike Usage by Month
+sns.barplot(x="mnth", y="cnt", data=day_df, ax=axs[1], palette="Greens")
+axs[1].set_title("Average Bike Usage by Month")
+
+# Average Bike Usage by Weekday
+sns.barplot(x="weekday", y="cnt", data=day_df, ax=axs[2], palette="Reds")
+axs[2].set_title("Average Bike Usage by Weekday")
+
+st.pyplot(fig)
+
+# Visualisasi Distribusi Penyewaan Berdasarkan Jam
+st.subheader("Total Bike Rentals per Hour")
+plt.figure(figsize=(12, 6))
+hourly_rentals = hour_df.groupby('hr')['cnt'].sum().reset_index()
+sns.barplot(x='hr', y='cnt', data=hourly_rentals, palette="viridis")
+plt.title("Total Bike Rentals per Hour")
+plt.xlabel("Hour of the Day")
+plt.ylabel("Total Rentals")
 st.pyplot(plt)
 
-# Insight for Monthly Bike Rentals
-st.markdown("""
-**Insight:**
-- Penyewaan sepeda paling tinggi terjadi di musim panas (Season 3), dengan penurunan drastis pada musim dingin (Season 1).
-""")
-
-# RFM Analysis for Registered Users
-st.subheader("RFM Analysis for Registered Users")
-rfm_df = day_df.groupby(['mnth', 'season'])['registered'].mean().reset_index()
-rfm_df.columns = ['Month', 'Season', 'Average Rentals (Registered Users)']
-rfm_df['Period'] = rfm_df['Month'].astype(str) + ' - Season ' + rfm_df['Season'].astype(str)
-rfm_df_cleaned = rfm_df[['Period', 'Average Rentals (Registered Users)']]
-st.write(rfm_df_cleaned)
-
-# Insight for RFM
-st.markdown("""
-**Insight:**
-- Pengguna terdaftar (registered users) cenderung menyewa lebih banyak sepeda selama musim panas.
-- Rata-rata penyewaan oleh pengguna terdaftar mencapai puncaknya pada bulan Mei hingga September.
-""")
+# Visualisasi Distribusi Pengguna Casual dan Registered Berdasarkan Kondisi Cuaca
+st.subheader("Casual vs Registered Users by Weather Condition")
+plt.figure(figsize=(12, 6))
+sns.boxplot(x='weathersit', y='casual', data=hour_df, color="green", showfliers=False)
+sns.boxplot(x='weathersit', y='registered', data=hour_df, color="purple", showfliers=False)
+plt.title("Casual vs Registered Users by Weather Condition")
+plt.xlabel("Weather Situation (1 = Clear, 2 = Mist, 3 = Light Snow/Rain)")
+plt.ylabel("Number of Rentals")
+plt.legend(['Casual Users', 'Registered Users'])
+st.pyplot(plt)
 
 # Clustering Analysis
 st.subheader("Clustering Analysis of Bike Rentals")
@@ -180,6 +187,22 @@ features = ['temp', 'atemp', 'hum', 'windspeed', 'casual', 'registered', 'cnt']
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(day_df[features])
 
+# Metode Elbow untuk Clustering
+st.subheader("Elbow Method for Optimal Number of Clusters")
+wcss = []
+for i in range(1, 11):
+    kmeans = KMeans(n_clusters=i, random_state=42)
+    kmeans.fit(X_scaled)
+    wcss.append(kmeans.inertia_)
+
+plt.figure(figsize=(8, 6))
+plt.plot(range(1, 11), wcss, marker='o', linestyle='--')
+plt.title('Elbow Method for Optimal Number of Clusters')
+plt.xlabel('Number of Clusters')
+plt.ylabel('WCSS')
+st.pyplot(plt)
+
+# Clustering dengan 3 cluster
 kmeans = KMeans(n_clusters=3, random_state=42)
 day_df['Cluster'] = kmeans.fit_predict(X_scaled)
 
@@ -192,15 +215,6 @@ plt.legend(title='Cluster')
 plt.grid(True)
 plt.tight_layout()
 st.pyplot(plt)
-
-# Insight for Clustering
-st.markdown("""
-**Insight:**
-- Clustering mengelompokkan hari berdasarkan faktor cuaca dan jumlah penyewaan sepeda.
-- Cluster 0 mewakili hari dengan suhu sedang dan penyewaan moderat.
-- Cluster 1 mewakili hari panas dengan penyewaan tinggi.
-- Cluster 2 mewakili hari dingin dengan penyewaan rendah.
-""")
 
 # Cluster Characteristics Analysis
 st.subheader("Cluster Characteristics Analysis")
@@ -225,7 +239,5 @@ Berdasarkan analisis yang telah dilakukan, terdapat beberapa insight utama yang 
    
 3. **Pengguna Casual vs Registered**: Pengguna casual lebih sensitif terhadap kondisi cuaca dan lebih banyak menyewa sepeda pada siang hari. Di sisi lain, pengguna terdaftar (registered) cenderung menggunakan sepeda lebih sering pada pagi dan sore hari, terutama untuk keperluan komuter.
    
-4. **RFM Analysis**: Pengguna terdaftar lebih aktif selama musim panas, dengan puncak penyewaan terjadi pada bulan Mei hingga September.
-   
-5. **Clustering**: Analisis clustering mengelompokkan hari-hari dengan penyewaan tinggi, sedang, dan rendah, berdasarkan faktor cuaca. Hari dengan suhu tinggi dan kelembapan rendah cenderung memiliki penyewaan tertinggi, sedangkan hari dengan suhu dingin dan angin kencang memiliki penyewaan terendah.
+4. **Clustering**: Analisis clustering mengelompokkan hari-hari dengan penyewaan tinggi, sedang, dan rendah, berdasarkan faktor cuaca. Hari dengan suhu tinggi dan kelembapan rendah cenderung memiliki penyewaan tertinggi, sedangkan hari dengan suhu dingin dan angin kencang memiliki penyewaan yang lebih rendah.
 """)
